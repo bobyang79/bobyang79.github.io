@@ -8,18 +8,23 @@
         body {
             text-align: center;
             font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
             position: relative;
         }
         #countdown-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
+            position: relative;
+            width: 30vmin;
+            height: 30vmin;
         }
         #countdown {
-            font-size: 48px;
+            font-size: 10vmin;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -27,28 +32,38 @@
             z-index: 5;
         }
         #click-position {
-            position: fixed;
-            width: 10px;
-            height: 10px;
+            position: absolute;
+            width: 2vmin;
+            height: 2vmin;
             background-color: red;
             border-radius: 50%;
             display: none;
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
+        #controls {
+            position: absolute;
+            bottom: 10vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         #restart-btn {
-            padding: 10px 20px;
-            font-size: 18px;
+            padding: 1vmin 2vmin;
+            font-size: 2vmin;
             cursor: pointer;
-            position: relative;
+            margin-top: 2vmin;
             z-index: 10;
         }
         .blue-dot {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 2vmin;
+            height: 2vmin;
             background-color: blue;
             border-radius: 50%;
+        }
+        #speed-control {
+            margin-top: 2vmin;
         }
     </style>
 </head>
@@ -57,21 +72,27 @@
         <div id="countdown">20</div>
     </div>
     <div id="click-position"></div>
-    <button id="restart-btn">重新開始</button>
+    <div id="controls">
+        <button id="restart-btn">重新開始</button>
+        <input id="speed-control" type="range" min="0.1" max="1.0" step="0.1" value="0.5"> 
+        <label for="speed-control">倒數速度: <span id="speed-value">0.5</span> 秒</label>
+    </div>
     
     <script>
         let count;
         let interval;
         let clickEnabled = true;
         let dots = [];
+        let countdownSpeed = 500;
 
         function createDots() {
             const container = document.getElementById('countdown-container');
             container.innerHTML = '<div id="countdown">' + count + '</div>';
             dots = [];
-            const radius = 80;
-            const centerX = 100;
-            const centerY = 100;
+            const containerSize = Math.min(window.innerWidth, window.innerHeight) * 0.3;
+            const radius = containerSize * 0.5;
+            const centerX = containerSize * 0.5;
+            const centerY = containerSize * 0.5;
             for (let i = 0; i < 20; i++) {
                 const angle = ((20 - i) / 20) * (2 * Math.PI) - (Math.PI / 2);
                 const x = centerX + radius * Math.cos(angle);
@@ -101,15 +122,16 @@
                     }
                 }
                 if (count <= 0) clearInterval(interval);
-            }, 1000);
+            }, countdownSpeed);
         }
 
         document.body.addEventListener('click', (event) => {
-            if (event.target.id !== 'restart-btn' && count > 0 && clickEnabled) {
+            if (event.target.id !== 'restart-btn' && event.target.id !== 'speed-control' && count > 0 && clickEnabled) {
                 clearInterval(interval);
+                clickEnabled = false;
                 let clickIndicator = document.getElementById('click-position');
-                clickIndicator.style.left = `${event.pageX}px`;
-                clickIndicator.style.top = `${event.pageY}px`;
+                clickIndicator.style.left = `${event.clientX}px`;
+                clickIndicator.style.top = `${event.clientY}px`;
                 clickIndicator.style.display = 'block';
             }
         });
@@ -117,15 +139,17 @@
         document.getElementById('restart-btn').addEventListener('click', (event) => {
             event.stopPropagation();
             clearInterval(interval);
-            clickEnabled = false;
+            clickEnabled = true;
             startCountdown();
-            setTimeout(() => {
-                clickEnabled = true;
-            }, 1000);
+        });
+
+        document.getElementById('speed-control').addEventListener('input', (event) => {
+            countdownSpeed = event.target.value * 1000;
+            document.getElementById('speed-value').textContent = event.target.value;
+            startCountdown();
         });
         
         startCountdown();
     </script>
 </body>
 </html>
-
