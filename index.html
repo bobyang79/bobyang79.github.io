@@ -81,7 +81,8 @@
     <script>
         let count;
         let interval;
-        let firstClick = null;
+        let firstClickTime = null;
+        let firstClickPos = null;
         let dots = [];
         let countdownSpeed = 500;
 
@@ -111,7 +112,8 @@
             document.getElementById('countdown').textContent = count;
             document.querySelectorAll('.click-marker').forEach(el => el.remove());
             clearInterval(interval);
-            firstClick = null;
+            firstClickTime = null;
+            firstClickPos = null;
             createDots();
             interval = setInterval(() => {
                 if (count > 0) {
@@ -125,16 +127,22 @@
             }, countdownSpeed);
         }
 
-        document.body.addEventListener('click', (event) => {
-            if (event.target.id === 'restart-btn' || event.target.id === 'speed-control' || firstClick) return;
+        document.body.addEventListener('pointerdown', (event) => {
+            if (event.target.id === 'restart-btn' || event.target.id === 'speed-control') return;
             if (count > 0) {
-                firstClick = { x: event.clientX, y: event.clientY };
-                clearInterval(interval); // 停止倒數
-                let marker = document.createElement('div');
-                marker.className = 'click-marker fastest';
-                marker.style.left = `${firstClick.x}px`;
-                marker.style.top = `${firstClick.y}px`;
-                document.body.appendChild(marker);
+                const clickTime = performance.now();
+                if (!firstClickTime || clickTime < firstClickTime) {
+                    firstClickTime = clickTime;
+                    firstClickPos = { x: event.clientX, y: event.clientY };
+                    clearInterval(interval); // 停止倒數
+                    
+                    document.querySelectorAll('.click-marker').forEach(el => el.remove());
+                    let marker = document.createElement('div');
+                    marker.className = 'click-marker fastest';
+                    marker.style.left = `${firstClickPos.x}px`;
+                    marker.style.top = `${firstClickPos.y}px`;
+                    document.body.appendChild(marker);
+                }
             }
         });
 
