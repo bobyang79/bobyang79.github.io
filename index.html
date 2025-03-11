@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>倒數計時器</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+        #countdown-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+        }
+        #countdown {
+            font-size: 48px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+        }
+        #click-position {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            display: none;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        #restart-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+        }
+        .blue-dot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: blue;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="countdown-container">
+        <div id="countdown">20</div>
+    </div>
+    <div id="click-position"></div>
+    <button id="restart-btn">重新開始</button>
+    
+    <script>
+        let count;
+        let interval;
+        let clickEnabled = true;
+        let dots = [];
+
+        function createDots() {
+            const container = document.getElementById('countdown-container');
+            container.innerHTML = '<div id="countdown">' + count + '</div>';
+            dots = [];
+            const radius = 80;
+            const centerX = 100;
+            const centerY = 100;
+            for (let i = 0; i < 20; i++) {
+                const angle = ((20 - i) / 20) * (2 * Math.PI) - (Math.PI / 2);
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                const dot = document.createElement('div');
+                dot.className = 'blue-dot';
+                dot.style.left = `${x}px`;
+                dot.style.top = `${y}px`;
+                container.appendChild(dot);
+                dots.push(dot);
+            }
+        }
+
+        function startCountdown() {
+            count = 20;
+            document.getElementById('countdown').textContent = count;
+            document.getElementById('click-position').style.display = 'none';
+            clearInterval(interval);
+            createDots();
+            clickEnabled = true;
+            interval = setInterval(() => {
+                if (count > 0) {
+                    count--;
+                    document.getElementById('countdown').textContent = count;
+                    if (dots.length > 0) {
+                        dots.shift().remove();
+                    }
+                }
+                if (count <= 0) clearInterval(interval);
+            }, 1000);
+        }
+
+        document.body.addEventListener('click', (event) => {
+            if (event.target.id !== 'restart-btn' && count > 0 && clickEnabled) {
+                clearInterval(interval);
+                let clickIndicator = document.getElementById('click-position');
+                clickIndicator.style.left = `${event.pageX}px`;
+                clickIndicator.style.top = `${event.pageY}px`;
+                clickIndicator.style.display = 'block';
+            }
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', (event) => {
+            event.stopPropagation();
+            clearInterval(interval);
+            clickEnabled = false;
+            startCountdown();
+            setTimeout(() => {
+                clickEnabled = true;
+            }, 1000);
+        });
+        
+        startCountdown();
+    </script>
+</body>
+</html>
+
