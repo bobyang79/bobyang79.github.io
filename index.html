@@ -13,10 +13,21 @@
             width: 100vw;
             height: 100vh;
             display: flex;
+            flex-direction: column;
+        }
+        #top-half, #bottom-half {
+            width: 100%;
+            height: 50%;
+            display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             position: relative;
+        }
+        #top-half {
+            background-color: lightblue;
+        }
+        #bottom-half {
+            background-color: lightgreen;
         }
         #countdown-container {
             position: relative;
@@ -44,10 +55,11 @@
         }
         #controls {
             position: absolute;
-            bottom: 10vh;
+            bottom: 5vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%;
         }
         #restart-btn {
             padding: 1vmin 2vmin;
@@ -69,8 +81,11 @@
     </style>
 </head>
 <body>
-    <div id="countdown-container">
-        <div id="countdown">20</div>
+    <div id="top-half"></div>
+    <div id="bottom-half">
+        <div id="countdown-container">
+            <div id="countdown">20</div>
+        </div>
     </div>
     <div id="controls">
         <button id="restart-btn">重新開始</button>
@@ -81,70 +96,38 @@
     <script>
         let count;
         let interval;
-        let firstClickTime = null;
-        let firstClickPos = null;
-        let dots = [];
+        let firstClickRecorded = false;
         let countdownSpeed = 500;
-
-        function createDots() {
-            const container = document.getElementById('countdown-container');
-            container.innerHTML = '<div id="countdown">' + count + '</div>';
-            dots = [];
-            const containerSize = Math.min(window.innerWidth, window.innerHeight) * 0.3;
-            const radius = containerSize * 0.5;
-            const centerX = containerSize * 0.5;
-            const centerY = containerSize * 0.5;
-            for (let i = 0; i < 20; i++) {
-                const angle = ((20 - i) / 20) * (2 * Math.PI) - (Math.PI / 2);
-                const x = centerX + radius * Math.cos(angle);
-                const y = centerY + radius * Math.sin(angle);
-                const dot = document.createElement('div');
-                dot.className = 'blue-dot';
-                dot.style.left = `${x}px`;
-                dot.style.top = `${y}px`;
-                container.appendChild(dot);
-                dots.push(dot);
-            }
-        }
 
         function startCountdown() {
             count = 20;
             document.getElementById('countdown').textContent = count;
             document.querySelectorAll('.click-marker').forEach(el => el.remove());
             clearInterval(interval);
-            firstClickTime = null;
-            firstClickPos = null;
-            createDots();
+            firstClickRecorded = false;
             interval = setInterval(() => {
                 if (count > 0) {
                     count--;
                     document.getElementById('countdown').textContent = count;
-                    if (dots.length > 0) {
-                        dots.shift().remove();
-                    }
                 }
                 if (count <= 0) clearInterval(interval);
             }, countdownSpeed);
         }
 
-        document.body.addEventListener('pointerdown', (event) => {
-            if (event.target.id === 'restart-btn' || event.target.id === 'speed-control') return;
-            if (count > 0) {
-                const clickTime = performance.now();
-                if (!firstClickTime || clickTime < firstClickTime) {
-                    firstClickTime = clickTime;
-                    firstClickPos = { x: event.clientX, y: event.clientY };
-                    clearInterval(interval); // 停止倒數
-                    
-                    document.querySelectorAll('.click-marker').forEach(el => el.remove());
-                    let marker = document.createElement('div');
-                    marker.className = 'click-marker fastest';
-                    marker.style.left = `${firstClickPos.x}px`;
-                    marker.style.top = `${firstClickPos.y}px`;
-                    document.body.appendChild(marker);
-                }
+        function handleClick(event) {
+            if (count > 0 && !firstClickRecorded) {
+                firstClickRecorded = true;
+                clearInterval(interval); // 停止倒數
+                let marker = document.createElement('div');
+                marker.className = 'click-marker fastest';
+                marker.style.left = `${event.clientX}px`;
+                marker.style.top = `${event.clientY}px`;
+                document.body.appendChild(marker);
             }
-        });
+        }
+
+        document.getElementById('top-half').addEventListener('pointerdown', handleClick);
+        document.getElementById('bottom-half').addEventListener('pointerdown', handleClick);
 
         document.getElementById('restart-btn').addEventListener('click', (event) => {
             event.stopPropagation();
