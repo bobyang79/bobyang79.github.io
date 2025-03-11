@@ -31,15 +31,16 @@
             transform: translate(-50%, -50%);
             z-index: 5;
         }
-        #click-position {
+        .click-marker {
             position: absolute;
             width: 2vmin;
             height: 2vmin;
-            background-color: red;
             border-radius: 50%;
-            display: none;
             transform: translate(-50%, -50%);
             pointer-events: none;
+        }
+        .fastest {
+            background-color: green;
         }
         #controls {
             position: absolute;
@@ -71,7 +72,6 @@
     <div id="countdown-container">
         <div id="countdown">20</div>
     </div>
-    <div id="click-position"></div>
     <div id="controls">
         <button id="restart-btn">重新開始</button>
         <input id="speed-control" type="range" min="0.1" max="1.0" step="0.1" value="0.5"> 
@@ -81,7 +81,7 @@
     <script>
         let count;
         let interval;
-        let clickEnabled = true;
+        let firstClick = null;
         let dots = [];
         let countdownSpeed = 500;
 
@@ -109,10 +109,10 @@
         function startCountdown() {
             count = 20;
             document.getElementById('countdown').textContent = count;
-            document.getElementById('click-position').style.display = 'none';
+            document.querySelectorAll('.click-marker').forEach(el => el.remove());
             clearInterval(interval);
+            firstClick = null;
             createDots();
-            clickEnabled = true;
             interval = setInterval(() => {
                 if (count > 0) {
                     count--;
@@ -126,20 +126,21 @@
         }
 
         document.body.addEventListener('click', (event) => {
-            if (event.target.id !== 'restart-btn' && event.target.id !== 'speed-control' && count > 0 && clickEnabled) {
-                clearInterval(interval);
-                clickEnabled = false;
-                let clickIndicator = document.getElementById('click-position');
-                clickIndicator.style.left = `${event.clientX}px`;
-                clickIndicator.style.top = `${event.clientY}px`;
-                clickIndicator.style.display = 'block';
+            if (event.target.id === 'restart-btn' || event.target.id === 'speed-control' || firstClick) return;
+            if (count > 0) {
+                firstClick = { x: event.clientX, y: event.clientY };
+                clearInterval(interval); // 停止倒數
+                let marker = document.createElement('div');
+                marker.className = 'click-marker fastest';
+                marker.style.left = `${firstClick.x}px`;
+                marker.style.top = `${firstClick.y}px`;
+                document.body.appendChild(marker);
             }
         });
 
         document.getElementById('restart-btn').addEventListener('click', (event) => {
             event.stopPropagation();
             clearInterval(interval);
-            clickEnabled = true;
             startCountdown();
         });
 
