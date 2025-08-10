@@ -66,6 +66,9 @@
         #speed-control {
             margin-top: 2vmin;
         }
+		.hidden {
+			visibility: hidden;
+		}
     </style>
 </head>
 <body>
@@ -149,7 +152,8 @@
 
                     document.getElementById('countdown').textContent = count;
                     if (dots.length > 0) {
-                        dots.shift().remove();
+                        //dots.shift().remove();
+						dots.shift().classList.add('hidden');
                     }
                 }
                 if (count <= 0) clearInterval(interval);
