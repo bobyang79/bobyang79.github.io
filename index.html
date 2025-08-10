@@ -70,14 +70,36 @@
 </head>
 <body>
     <div id="countdown-container">
-        <div id="countdown">500</div>
+        <div id="countdown">Welcome</div>
     </div>
     <div id="controls">
         <button id="restart-btn">Restart</button>
         <input id="speed-control" type="range" min="0.1" max="1.0" step="0.1" value="0.5"> 
         <label for="speed-control">Speed: <span id="speed-value">0.5</span> 秒</label>
     </div>
-    
+    <audio id="beep-sound" src="beep.mp3" preload="auto"></audio> 
+	<audio class="beep" src="a0.mp3" preload="auto"></audio>
+	<audio class="beep" src="a1.mp3" preload="auto"></audio>
+	<audio class="beep" src="a2.mp3" preload="auto"></audio>
+	<audio class="beep" src="a3.mp3" preload="auto"></audio>
+	<audio class="beep" src="a4.mp3" preload="auto"></audio>
+	<audio class="beep" src="a5.mp3" preload="auto"></audio>
+	<audio class="beep" src="a6.mp3" preload="auto"></audio>
+	<audio class="beep" src="a7.mp3" preload="auto"></audio>
+	<audio class="beep" src="a8.mp3" preload="auto"></audio>
+	<audio class="beep" src="a9.mp3" preload="auto"></audio>
+	<audio class="beep" src="a10.mp3" preload="auto"></audio>
+	<audio class="beep" src="a11.mp3" preload="auto"></audio>
+	<audio class="beep" src="a12.mp3" preload="auto"></audio>
+	<audio class="beep" src="a13.mp3" preload="auto"></audio>
+	<audio class="beep" src="a14.mp3" preload="auto"></audio>
+	<audio class="beep" src="a15.mp3" preload="auto"></audio>
+	<audio class="beep" src="a16.mp3" preload="auto"></audio>
+	<audio class="beep" src="a17.mp3" preload="auto"></audio>
+	<audio class="beep" src="a18.mp3" preload="auto"></audio>
+	<audio class="beep" src="a19.mp3" preload="auto"></audio>
+	<audio class="beep" src="a20.mp3" preload="auto"></audio>
+	
     <script>
         let count;
         let interval;
@@ -116,9 +138,15 @@
             firstClickTime = null;
             firstClickPos = null;
             createDots();
+			const beepSound = document.getElementById('beep-sound'); // 取得音效元素
+			const beepSounds = Array.from(document.querySelectorAll('.beep'));
+
             interval = setInterval(() => {
                 if (count > 0) {
                     count--;
+                    beepSounds[count].currentTime = 0; 
+					beepSounds[count].play();
+
                     document.getElementById('countdown').textContent = count;
                     if (dots.length > 0) {
                         dots.shift().remove();
@@ -148,6 +176,9 @@
         });
 
         document.getElementById('restart-btn').addEventListener('click', (event) => {
+			const beepSound = document.getElementById('beep-sound'); // 取得音效元素
+			beepSound.play();
+
             event.stopPropagation();
             clearInterval(interval);
             startCountdown();
@@ -159,7 +190,6 @@
             startCountdown();
         });
         
-        startCountdown();
     </script>
 </body>
 </html>
