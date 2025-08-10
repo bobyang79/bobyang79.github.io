@@ -31,6 +31,13 @@
             transform: translate(-50%, -50%);
             z-index: 5;
         }
+		#infomation {
+            position: absolute;
+            top: 80%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+        }
         .click-marker {
             position: absolute;
             width: 2vmin;
@@ -74,6 +81,7 @@
 <body>
     <div id="countdown-container">
         <div id="countdown">Loading</div>
+		<label id = "infomation">Need 10~30 seconds</label>
     </div>
     <div id="controls">
         <button id="restart-btn">Restart</button>
@@ -157,7 +165,7 @@
 			document.getElementById('countdown').textContent = 'Ready';
 			
 			myButton.disabled = false;
-			
+			document.getElementById('infomation').textContent = '';
 		}
 		loadAllSounds()
 		
