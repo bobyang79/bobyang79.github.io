@@ -73,7 +73,7 @@
 </head>
 <body>
     <div id="countdown-container">
-        <div id="countdown">Welcome</div>
+        <div id="countdown">Loading</div>
     </div>
     <div id="controls">
         <button id="restart-btn">Restart</button>
@@ -144,6 +144,7 @@
 		}
 		
 		async function loadAllSounds() {
+			myButton.disabled = true;
 			for (let i = 0; i <= 20; i++) {
 				try {
 					const buffer = await loadSound(`a${i}.mp3`);
@@ -152,7 +153,10 @@
 					console.error(`載入音效 a${i}.mp3 失敗`, e);
 				}
 			}
-			document.getElementById('countdown').textContent = 'READY';
+			document.getElementById('countdown').textContent = 'Ready';
+			const myButton = document.getElementById('restart-btn');
+			myButton.disabled = false;
+			
 		}
 		loadAllSounds()
 		
