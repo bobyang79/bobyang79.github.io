@@ -132,6 +132,40 @@
                 dots.push(dot);
             }
         }
+		
+		const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+		const audioBuffers = [];
+		
+		// 載入單一音效檔，回傳 AudioBuffer
+		async function loadSound(url) {
+			const response = await fetch(url);
+			const arrayBuffer = await response.arrayBuffer();
+			return await audioCtx.decodeAudioData(arrayBuffer);
+		}
+		
+		async function loadAllSounds() {
+			for (let i = 0; i <= 20; i++) {
+				try {
+					const buffer = await loadSound(`a${i}.mp3`);
+					audioBuffers[i] = buffer;
+				} catch (e) {
+					console.error(`載入音效 a${i}.mp3 失敗`, e);
+				}
+			}
+			document.getElementById('countdown').textContent = 'READY';
+		}
+		loadAllSounds()
+		
+		    function playSound(index) {
+        if (!audioBuffers[index]) {
+            console.warn('音效不存在', index);
+            return;
+        }
+        const source = audioCtx.createBufferSource();
+        source.buffer = audioBuffers[index];
+        source.connect(audioCtx.destination);
+        source.start();
+    }
 
         function startCountdown() {
             count = 20;
@@ -147,9 +181,9 @@
             interval = setInterval(() => {
                 if (count > 0) {
                     count--;
-                    beepSounds[count].currentTime = 0; 
-					beepSounds[count].play();
-
+                    //beepSounds[count].currentTime = 0; 
+					//beepSounds[count].play();
+					playSound(count);
                     document.getElementById('countdown').textContent = count;
                     if (dots.length > 0) {
                         //dots.shift().remove();
