@@ -144,6 +144,7 @@
 		}
 		
 		async function loadAllSounds() {
+			const myButton = document.getElementById('restart-btn');
 			myButton.disabled = true;
 			for (let i = 0; i <= 20; i++) {
 				try {
@@ -154,7 +155,7 @@
 				}
 			}
 			document.getElementById('countdown').textContent = 'Ready';
-			const myButton = document.getElementById('restart-btn');
+			
 			myButton.disabled = false;
 			
 		}
